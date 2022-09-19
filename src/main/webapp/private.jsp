@@ -22,6 +22,8 @@
 <body>
 <div class="container" style="margin-top: 20px;">
 
+    <h1>ADMIN</h1>
+
     <div class="row">
         <div class="col">
             <div class="card" style="width: 18rem;">
