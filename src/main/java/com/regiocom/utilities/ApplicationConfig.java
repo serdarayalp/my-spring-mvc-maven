@@ -17,8 +17,10 @@ public class ApplicationConfig implements WebMvcConfigurer {
         return viewResolver;
     }
 
-    /*@Override
+    /*
+    @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/images/**").addResourceLocations("/images/");
-    }*/
+    }
+    */
 }

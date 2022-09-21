@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mvc="http://www.springframework.org/schema/mvc"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:security="http://www.springframework.org/schema/security"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context
        http://www.springframework.org/schema/context/spring-context.xsd
-       http://www.springframework.org/schema/mvc
-       http://www.springframework.org/schema/mvc/spring-mvc.xsd
        http://www.springframework.org/schema/security
        http://www.springframework.org/schema/security/spring-security.xsd">
 
@@ -18,48 +15,67 @@
 
     <!-- <mvc:annotation-driven/> -->
 
-    <!--<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    <!--
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/"/>
         <property name="suffix" value=".jsp"/>
-    </bean>-->
+    </bean>
+    -->
 
 
-    <!-- ************************************** -->
+    <!-- ******************************************************************************** -->
 
     <context:component-scan base-package="org.keycloak.adapters.springsecurity"/>
 
+    <!-- führt die Authentifizierung mit einem KeycloakAuthenticationToken durch. -->
     <bean id="keycloakAuthenticationProvider"
           class="org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider"/>
 
-    <security:authentication-manager alias="authenticationManager">
+    <!-- registriert die AuthenticationManager-Instanz und ermöglicht die Definition seiner Liste von AuthenticationProvidern.
+    Außerdem können Sie einen Alias definieren, um den AuthenticationManager in Ihren eigenen Beans referenzieren zu können. -->
+    <security:authentication-manager alias="keycloakAuthenticationManager">
         <security:authentication-provider ref="keycloakAuthenticationProvider"/>
     </security:authentication-manager>
 
+    <!-- bietet einen Keycloak-Authentifizierungsverarbeitungsfilter (AuthenticationProcessingFilter). -->
     <bean id="keycloakAuthenticationProcessingFilter"
           class="org.keycloak.adapters.springsecurity.filter.KeycloakAuthenticationProcessingFilter">
-        <constructor-arg name="authenticationManager" ref="authenticationManager"/>
+        <constructor-arg name="authenticationManager" ref="keycloakAuthenticationManager"/>
     </bean>
 
+    <!-- FactoryBean, die einen AdapterDeploymentContext aus einer Ressource erzeugt, die die Keycloak-Client-Konfiguration oder einen KeycloakConfigResolver für mandantenfähige Umgebungen definiert. -->
     <bean id="adapterDeploymentContext"
           class="org.keycloak.adapters.springsecurity.AdapterDeploymentContextFactoryBean">
         <constructor-arg value="/WEB-INF/keycloak.json"/>
     </bean>
 
+    <!-- bietet einen Keycloak-Authentifizierungs-Einstiegspunkt. Verwendet einen RequestMatcher, um festzustellen, ob es sich bei der Anfrage um eine interaktive Login-Anfrage oder eine API-Anfrage handelt, die nicht auf eine interaktive Login-Seite umgeleitet werden soll. Standardmäßig verwendet dieser Einstiegspunkt einen HttpHeaderInspectingApiRequestMatcher, kann aber im Konstruktor überschrieben werden. -->
     <bean id="keycloakAuthenticationEntryPoint"
           class="org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationEntryPoint">
         <constructor-arg ref="adapterDeploymentContext"/>
     </bean>
 
+    <!-- Meldet den aktuellen Benutzer von Keycloak ab. -->
     <bean id="keycloakLogoutHandler" class="org.keycloak.adapters.springsecurity.authentication.KeycloakLogoutHandler">
         <constructor-arg ref="adapterDeploymentContext"/>
     </bean>
 
+    <!-- Stellt einen Keycloak-Adapter PreAuthActionsHandler als Spring Security Filter zur Verfügung. -->
     <bean id="keycloakPreAuthActionsFilter"
           class="org.keycloak.adapters.springsecurity.filter.KeycloakPreAuthActionsFilter"/>
 
     <bean id="keycloakSecurityContextRequestFilter"
           class="org.keycloak.adapters.springsecurity.filter.KeycloakSecurityContextRequestFilter"/>
 
+    <!--
+    Meldet einen Benutzer ab.
+
+    Ruft eine Reihe von LogoutHandlern ab. Die Handler sollten in der Reihenfolge angegeben werden, in der sie benötigt werden.
+    Im Allgemeinen werden Sie die Logout-Handler TokenBasedRememberMeServices und SecurityContextLogoutHandler (in dieser Reihenfolge) aufrufen wollen.
+
+    Nach dem Logout wird eine Umleitung zu der URL durchgeführt, die entweder durch den konfigurierten
+    LogoutSuccessHandler oder die logoutSuccessUrl bestimmt wird, je nachdem, welcher Konstruktor verwendet wurde.
+    -->
     <bean id="logoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
         <constructor-arg name="logoutSuccessUrl" value="/"/>
         <constructor-arg name="handlers">
@@ -69,34 +85,50 @@
             </list>
         </constructor-arg>
         <property name="logoutRequestMatcher">
+            <!--
+            Erstellt einen Matcher mit dem angegebenen Muster und der HTTP-Methode unter Berücksichtigung der Groß- und Kleinschreibung.
+            Params:
+                pattern - das für den Abgleich zu verwendende Muster
+                httpMethode - die HTTP-Methode. Die Matching-Methode gibt false zurück, wenn die eingehende Anfrage nicht dieselbe Methode hat.
+            -->
             <bean class="org.springframework.security.web.util.matcher.AntPathRequestMatcher">
-                <constructor-arg name="pattern" value="/sso/logout**"/>
+                <constructor-arg name="pattern" value="/logout**"/>
                 <constructor-arg name="httpMethod" value="GET"/>
             </bean>
         </property>
     </bean>
 
+    <!-- entry-point-ref: ermöglicht die Festlegung eines benutzerdefinierten AuthenticationEntryPoint für den ExceptionTranslationFilter. -->
     <security:http auto-config="false" entry-point-ref="keycloakAuthenticationEntryPoint">
-        <security:custom-filter ref="keycloakPreAuthActionsFilter" before="LOGOUT_FILTER"/>
+
+        <!--
+        before: Der Filter, vor dem der benutzerdefinierte Filter in der Kette platziert werden soll
+
+        after: Der Filter, nach dem der benutzerdefinierte Filter in der Kette platziert werden soll. Diese Funktion wird nur von fortgeschrittenen Benutzern benötigt, die ihre eigenen Filter in die Sicherheitsfilterkette mischen möchten und über einige Kenntnisse der Standard-Spring-Security-Filter verfügen. Die Filternamen entsprechen den spezifischen Spring Security-Implementierungsfiltern.
+        -->
         <security:custom-filter ref="keycloakAuthenticationProcessingFilter" before="FORM_LOGIN_FILTER"/>
         <security:custom-filter ref="keycloakSecurityContextRequestFilter" after="FORM_LOGIN_FILTER"/>
+
+        <security:custom-filter ref="keycloakPreAuthActionsFilter" before="LOGOUT_FILTER"/>
         <security:custom-filter ref="logoutFilter" position="LOGOUT_FILTER"/>
+
         <security:intercept-url pattern="/" access="hasAnyRole('ROLE_ADMIN')"/>
     </security:http>
 
 
     <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
 
-    <!--<authentication-manager id="authenticationManager">
-        <authentication-provider>
-            <password-encoder ref="passwordEncoder"/>
+    <security:authentication-manager id="authenticationManager">
+        <security:authentication-provider>
+            <security:password-encoder ref="passwordEncoder"/>
 
-            <user-service>
-                &lt;!&ndash; Password = 1234 &ndash;&gt;
-                <user name="admin" password="$2a$12$fKi6DQXbu1yYIyCdHip/guYXqDZqmAXfxKft5S0KCOatCjmBeTLMi"
-                      authorities="ROLE_ADMIN"/>
-            </user-service>
-        </authentication-provider>
-    </authentication-manager>-->
+            <security:user-service>
+                <!-- Password = 1234 -->
+                <security:user name="admin"
+                               password="$2a$12$fKi6DQXbu1yYIyCdHip/guYXqDZqmAXfxKft5S0KCOatCjmBeTLMi"
+                               authorities="ROLE_ADMIN"/>
+            </security:user-service>
+        </security:authentication-provider>
+    </security:authentication-manager>
 
 </beans>
