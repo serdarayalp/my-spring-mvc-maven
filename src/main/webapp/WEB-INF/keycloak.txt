@@ -1,0 +1,74 @@
+{
+  "realm" : "demo",
+        ERFORDERLICH. Name des REALMs.
+  "resource" : "customer-portal",
+        ERFORDERLICH. Die client-id der Anwendung. Jede Anwendung hat eine Client-ID, die zur Identifizierung der Anwendung verwendet wird.
+  "realm-public-key" : "MIGfMA0GCSqGSIb3D...31LwIDAQAB",
+        OPTIONAL und es wird nicht empfohlen, sie zu setzen. PEM-Format des öffentlichen Schlüssels des Realms. Sie können diesen von der Admin Console erhalten. Wenn er nicht gesetzt ist, lädt der Adapter ihn von Keycloak herunter und lädt ihn bei Bedarf immer wieder neu herunter (z.B. wenn Keycloak seine Schlüssel rotiert). Wenn der realm-public-key jedoch gesetzt ist, wird der Adapter niemals neue Schlüssel von Keycloak herunterladen, so dass der Adapter kaputt geht, wenn Keycloak seine Schlüssel rotiert.
+  "auth-server-url" : "https://localhost:8443",
+        ERFORDERLICH. Die Basis-URL des Keycloak-Servers. Alle anderen Keycloak-Seiten und REST-Service-Endpunkte werden von dieser abgeleitet. Sie hat normalerweise die Form https://host:port.
+  "ssl-required" : "external",
+        OPTIONAL. Stellt sicher, dass die gesamte Kommunikation zum und vom Keycloak-Server über HTTPS erfolgt. In der Produktion sollte dies auf "all" gesetzt werden. Der Standardwert ist "external", was bedeutet, dass HTTPS standardmäßig für externe Anfragen erforderlich ist. Gültige Werte sind "all", "external" und "none".
+  "confidential-port" : "8443",
+        OPTIONAL. Der vertrauliche Port, den der Keycloak-Server für sichere Verbindungen über SSL/TLS verwendet. Der Standardwert ist 8443.
+  "use-resource-role-mappings" : false,
+        OPTIONAL. Wenn auf true gesetzt, wird der Adapter innerhalb des Tokens nach Rollen Mappings auf Anwendungsebene für den Benutzer suchen. Wenn false, wird er auf der Realm Ebene nach Benutzer Rollen Mappings suchen. Der Standardwert ist false.
+  "public-client" : false,
+        OPTIONAL. Wenn auf true gesetzt, sendet der Adapter keine Credentials für den Client an Keycloak. Der Standardwert ist false.
+  "enable-cors" : false,
+        OPTIONAL. Dies aktiviert CORS-Unterstützung. Es wird CORS Preflight-Anfragen behandeln. Außerdem wird das Zugriffstoken untersucht, um gültige Ursprünge zu ermitteln. Der Standardwert ist false.
+  "cors-max-age" : 1000,
+        OPTIONAL. Wenn CORS aktiviert ist, wird hier der Wert des Headers "Access-Control-Max-Age" festgelegt. Wenn er nicht gesetzt ist, wird dieser Header in CORS-Antworten nicht zurückgegeben.
+  "cors-allowed-methods" : "POST, PUT, DELETE, GET",
+        OPTIONAL. Wenn CORS aktiviert ist, wird damit der Wert des Headers "Access-Control-Allow-Methods" festgelegt. Dies sollte eine durch Komma getrennte Zeichenkette sein. Wenn er nicht gesetzt ist, wird dieser Header in CORS-Antworten nicht zurückgegeben.
+  "cors-exposed-headers" : "WWW-Authenticate, My-custom-exposed-Header",
+        OPTIONAL. Wenn CORS aktiviert ist, wird damit der Wert des Headers "Access-Control-Expose-Headers" festgelegt. Dies sollte eine durch Komma getrennte Zeichenkette sein. Wenn er nicht gesetzt ist, wird dieser Header in CORS-Antworten nicht zurückgegeben.
+  "bearer-only" : false,
+        OPTIONAL. Dies sollte für Dienste auf true gesetzt werden. Wenn aktiviert, wird der Adapter nicht versuchen, Benutzer zu authentifizieren, sondern nur Träger-Token zu überprüfen. Der Standardwert ist false.
+  "autodetect-bearer-only" : false,
+        Dies sollte auf true gesetzt werden, wenn Ihre Anwendung sowohl eine Webanwendung als auch Webdienste (z.B. SOAP oder REST) anbietet. Es erlaubt Ihnen, nicht-authentifizierte Benutzer der Web-Anwendung auf die Keycloak-Login-Seite umzuleiten, aber stattdessen einen HTTP 401-Statuscode an nicht-authentifizierte SOAP- oder REST-Clients zu senden, da diese eine Umleitung zur Login-Seite nicht verstehen würden. Keycloak erkennt SOAP- oder REST-Clients automatisch anhand von typischen Headern wie X-Requested-With, SOAPAction oder Accept. Der Standardwert ist false.
+  "enable-basic-auth" : false,
+        OPTIONAL. Dies teilt dem Adapter mit, dass er auch Basic Authentication unterstützt. Wenn diese Option aktiviert ist, dann muss auch secret angegeben werden. Der Standardwert ist false.
+  "expose-token" : true,
+        OPTIONAL. If true, an authenticated browser client (via a JavaScript HTTP invocation) can obtain the signed access token via the URL "root/k_query_bearer_token". The default value is false.
+  "verify-token-audience" : true,
+        Wenn auf true gesetzt, dann wird der Adapter während der Authentifizierung mit dem Überbringer-Token überprüfen, ob das Token diesen Client-Namen (Ressource) als Publikum enthält. Die Option ist besonders nützlich für Dienste die hauptsächlich Anfragen bedienen die mit dem Überbringer Token authentifiziert wurden. Diese Option ist standardmäßig auf false gesetzt, für eine verbesserte Sicherheit wird jedoch empfohlen diese zu aktivieren. Siehe Audience Support (https://www.keycloak.org/docs/latest/server_admin/#audience-support) für weitere Details über Audience
+  "credentials" : {
+    "secret" : "234234-234234-234234"
+  },
+        REQUIRED only for clients with 'Confidential' access type. Specify the credentials of the application. This is an object notation where the key is the credential type and the value is the value of the credential type. Currently password and jwt is supported.
+  "connection-pool-size" : 20,
+        OPTIONAL. Diese Konfigurationsoption legt fest, wie viele Verbindungen zum Keycloak-Server gepoolt werden sollen. Der Standardwert ist 20.
+  "socket-timeout-millis" : 5000,
+        OPTIONAL. Timeout für den Socket, der nach dem Aufbau der Verbindung auf Daten wartet, in Millisekunden. Maximale Zeit der Inaktivität zwischen zwei Datenpaketen. Ein Timeout-Wert von Null wird als unendlicher Timeout interpretiert. Ein negativer Wert wird als undefiniert interpretiert (Systemvorgabe, falls zutreffend). Der Standardwert ist -1.
+  "connection-timeout-millis" : 6000,
+        Timeout für den Aufbau der Verbindung mit dem entfernten Host in Millisekunden. Ein Timeout-Wert von Null wird als unendlicher Timeout interpretiert. Ein negativer Wert wird als undefiniert interpretiert (Systemvorgabe, falls zutreffend). Der Standardwert ist -1.
+  "connection-ttl-millis" : 500,
+        OPTIONAL. Lebenszeit der Verbindung für den Client in Millisekunden. Ein Wert kleiner oder gleich Null wird als unendlicher Wert interpretiert. Der Standardwert ist -1.
+  "disable-trust-manager" : false,
+        OPTIONAL. Wenn der Keycloak-Server HTTPS benötigt und diese Konfigurationsoption auf true gesetzt ist, müssen Sie keinen Truststore angeben. Diese Einstellung sollte nur während der Entwicklung und niemals in der Produktion verwendet werden, da sie die Überprüfung von SSL-Zertifikaten deaktiviert. Der Standardwert ist false.
+  "allow-any-hostname" : false,
+        OPTIONAL. Wenn der Keycloak-Server HTTPS benötigt und diese Konfigurationsoption auf true gesetzt ist, wird das Zertifikat des Keycloak-Servers über den Truststore validiert, aber die Validierung des Hostnamens wird nicht durchgeführt. Diese Einstellung sollte nur während der Entwicklung und niemals in der Produktion verwendet werden, da sie die Überprüfung von SSL-Zertifikaten deaktiviert. Diese Einstellung kann in Testumgebungen nützlich sein. Sie ist OPTIONAL. Der Standardwert ist false.
+  "proxy-url" : "URL"
+         Die URL für den HTTP-Proxy, falls ein solcher verwendet wird.
+  "truststore" : "path/to/truststore.jks",
+        Der Wert ist der Dateipfad zu einer Truststore-Datei. Wenn Sie dem Pfad "classpath:" voranstellen, wird der Truststore stattdessen aus dem Klassenpfad des Deployments bezogen. Wird für ausgehende HTTPS-Kommunikation mit dem Keycloak-Server verwendet. Clients, die HTTPS-Anfragen stellen, benötigen eine Möglichkeit, den Host des Servers, mit dem sie kommunizieren, zu verifizieren. Das ist es, was der Trustore tut. Der Keystore enthält ein oder mehrere vertrauenswürdige Host-Zertifikate oder Zertifizierungsstellen. Sie können diesen Truststore erstellen, indem Sie das öffentliche Zertifikat des SSL-Keystore des Keycloak-Servers extrahieren. REQUIRED, außer ssl-required ist none oder disable-trust-manager ist true.
+  "truststore-password" : "geheim",
+        Passwort für den Truststore. ERFORDERLICH, wenn truststore eingestellt ist und der Truststore ein Passwort erfordert.
+  "client-keystore" : "path/to/client-keystore.jks",
+        OPTIONAL. Dies ist der Dateipfad zu einer Keystore-Datei. Dieser Keystore enthält Client-Zertifikate für Zwei-Wege-SSL, wenn der Adapter HTTPS-Anfragen an den Keycloak-Server stellt.
+  "client-keystore-password" : "geheim",
+        ERFORDERLICH, wenn client-keystore festgelegt ist. Passwort für den Client-Keystore.
+  "client-key-password" : "geheim",
+        ERFORDERLICH, wenn client-keystore eingestellt ist. Passwort für den Schlüssel des Clients.
+  "token-minimum-time-to-live" : 10,
+        OPTIONAL. Zeitspanne in Sekunden, um ein aktives Zugriffstoken vor seinem Ablauf mit dem Keycloak-Server zu aktualisieren. Dies ist besonders nützlich, wenn das Zugriffstoken an einen anderen REST-Client gesendet wird, wo es ablaufen könnte, bevor es ausgewertet wird. Dieser Wert sollte niemals die Lebensdauer des Zugriffstokens des Realms überschreiten. Der Standardwert ist 0 Sekunden, so dass der Adapter das Zugriffstoken nur aktualisiert, wenn es abgelaufen ist.(kostenlose Version)
+  "min-time-between-jwks-requests" : 10,
+        Zeitspanne in Sekunden, die den Mindestabstand zwischen zwei Anfragen an Keycloak zum Abrufen neuer öffentlicher Schlüssel angibt. Standardmäßig sind es 10 Sekunden. Der Adapter wird immer versuchen, einen neuen öffentlichen Schlüssel herunterzuladen, wenn er einen Token mit unbekanntem Kind erkennt, aber er wird es nicht öfter als einmal alle 10 Sekunden versuchen (Standardeinstellung). Dies dient dazu, DoS zu vermeiden, wenn ein Angreifer viele Token mit falschem Kind sendet und den Adapter zwingt, viele Anfragen an Keycloak zu senden.
+  "public-key-cache-ttl" : 86400,
+        Zeitspanne in Sekunden, die den maximalen Abstand zwischen zwei Anfragen an Keycloak zum Abrufen neuer öffentlicher Schlüssel angibt. Standardmäßig sind es 86400 Sekunden (1 Tag). Der Adapter wird immer versuchen einen neuen öffentlichen Schlüssel herunterzuladen, wenn er ein Token mit unbekanntem Kind erkennt. Wenn er einen Token mit bekanntem Kind erkennt, wird er den zuvor heruntergeladenen öffentlichen Schlüssel verwenden. Mindestens einmal in diesem konfigurierten Intervall (standardmäßig 1 Tag) wird jedoch immer ein neuer öffentlicher Schlüssel heruntergeladen, auch wenn das Kind des Tokens bereits bekannt ist.
+  "redirect-rewrite-rules" : {
+    "^/wsmaster/api/(.*)$" : "/api/$1"
+  }
+        Geben Sie bei Bedarf die Redirect-URI-Rewrite-Regel an. Dabei handelt es sich um eine Objektnotation, bei der der Schlüssel der reguläre Ausdruck ist, mit dem der Redirect-URI abgeglichen werden soll, und der Wert die Ersatzzeichenkette ist. Das Zeichen $ kann für Rückverweise in der Ersetzungszeichenfolge verwendet werden.
+}
