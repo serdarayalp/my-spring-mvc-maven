@@ -3,6 +3,8 @@
         ERFORDERLICH. Name des REALMs.
   "resource" : "customer-portal",
         ERFORDERLICH. Die client-id der Anwendung. Jede Anwendung hat eine Client-ID, die zur Identifizierung der Anwendung verwendet wird.
+  "principal-attribute" : "preferred_username",
+        OpenID Connect ID Token-Attribut, mit dem der UserPrincipal-Name aufgefüllt wird. Wenn das Token-Attribut null ist, wird standardmäßig sub verwendet. Mögliche Werte sind sub, preferred_username, email, name, nickname, given_name, family_name.
   "realm-public-key" : "MIGfMA0GCSqGSIb3D...31LwIDAQAB",
         OPTIONAL und es wird nicht empfohlen, sie zu setzen. PEM-Format des öffentlichen Schlüssels des Realms. Sie können diesen von der Admin Console erhalten. Wenn er nicht gesetzt ist, lädt der Adapter ihn von Keycloak herunter und lädt ihn bei Bedarf immer wieder neu herunter (z.B. wenn Keycloak seine Schlüssel rotiert). Wenn der realm-public-key jedoch gesetzt ist, wird der Adapter niemals neue Schlüssel von Keycloak herunterladen, so dass der Adapter kaputt geht, wenn Keycloak seine Schlüssel rotiert.
   "auth-server-url" : "https://localhost:8443",
