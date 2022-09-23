@@ -116,6 +116,7 @@
     </security:http>
 
 
+    <!--
     <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
 
     <security:authentication-manager id="authenticationManager">
@@ -123,12 +124,14 @@
             <security:password-encoder ref="passwordEncoder"/>
 
             <security:user-service>
-                <!-- Password = 1234 -->
+                &lt;!&ndash; Password = 1234 &ndash;&gt;
                 <security:user name="admin"
                                password="$2a$12$fKi6DQXbu1yYIyCdHip/guYXqDZqmAXfxKft5S0KCOatCjmBeTLMi"
                                authorities="ROLE_ADMIN"/>
             </security:user-service>
         </security:authentication-provider>
     </security:authentication-manager>
+    -->
+
 
 </beans>
