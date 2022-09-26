@@ -112,7 +112,7 @@
         <security:custom-filter ref="keycloakPreAuthActionsFilter" before="LOGOUT_FILTER"/>
         <security:custom-filter ref="logoutFilter" position="LOGOUT_FILTER"/>
 
-        <security:intercept-url pattern="/" access="hasAnyRole('ROLE_ADMIN')"/>
+        <security:intercept-url pattern="/" access="hasAnyRole('ROLE_SHELL_USER')"/>
     </security:http>
 
 
